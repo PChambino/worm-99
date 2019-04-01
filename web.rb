@@ -13,13 +13,23 @@ post '/battle/ping' do
 end
 
 post '/battle/start' do
-  'pong'
+  {
+    color: '#736CCB',
+    headType: 'sand-worm',
+    tailType: 'freckled'
+  }.to_json
 end
 
 post '/battle/move' do
-  'pong'
+  { move: random_move }.to_json
 end
 
 post '/battle/end' do
-  'pong'
+  'done'
+end
+
+MOVES = %w[up down left right].freeze
+
+def random_move
+  MOVES.sample
 end
