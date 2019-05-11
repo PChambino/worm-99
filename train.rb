@@ -3,8 +3,8 @@ require 'set'
 class Worm
   MOVES = %i[left up right down].freeze
 
-  def initialize
-    @brain = Brain.new inputs: 3, outputs: 3
+  def initialize **options
+    @brain = options.fetch(:brain) { Brain.new inputs: 3, outputs: 3 }
   end
 
   def init!
@@ -12,19 +12,19 @@ class Worm
   end
 
   def move field
-    moves_relative_to(orientation)
+    moves_relative_to(field.orientation)
       .zip(@brain.compute field.view)
       .max_by { |(_, value)| value }
       .first
   end
 
   def moves_relative_to orientation
-    MOVES.rotate(MOVES.index(orientation) - 1).first(3)
+    MOVES.rotate(MOVES.index(orientation) - 1).first 3
   end
 end
 
 class Brain
-  def initialize(inputs:, outputs:)
+  def initialize inputs:, outputs:
     @inputs = inputs.times.map { Node.new }
     @outputs = outputs.times.map { |name| Node.new }
     @layers = [@outputs]
@@ -33,7 +33,7 @@ class Brain
   def init!
     @links = @inputs.flat_map do |input|
       @outputs.map do |output|
-        Link.new(input: input, output: output, weight: rand, innovation: 1)
+        Link.new input: input, output: output, weight: rand, innovation: 1
       end
     end
     self
@@ -48,17 +48,17 @@ class Brain
   class Node
     attr_accessor :value
 
-    def initialize
-      @value = 0
+    def initialize value: 0
+      @value = value
       @inputs = Set[]
     end
 
-    def enable(input)
-      @inputs.add(input)
+    def enable input
+      @inputs.add input
     end
 
-    def disable(input)
-      @inputs.remove(input)
+    def disable input
+      @inputs.delete input
     end
 
     def compute
@@ -70,9 +70,9 @@ class Brain
   class Link
     # attr_reader :input, :output, :weight, :innovation
 
-    def initialize(input:, output:, weight:, innovation:)
+    def initialize input:, output:, weight:, innovation:
       @input, @output, @weight, @innovation = input, output, weight, innovation
-      @output.enable(self)
+      @output.enable self
     end
 
     def compute
@@ -80,7 +80,7 @@ class Brain
     end
 
     def disable
-      @output.disable(self)
+      @output.disable self
     end
   end
 end
