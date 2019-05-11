@@ -7,4 +7,5 @@ gem 'puma'
 
 group :development do
   gem 'shotgun'
+  gem 'minitest'
 end

@@ -1,10 +1,25 @@
 require 'set'
 
 class Worm
-  MOVES = %w[up down left right].freeze
+  MOVES = %i[left up right down].freeze
 
-  def move(inputs)
-    MOVES.sample
+  def initialize
+    @brain = Brain.new inputs: 3, outputs: 3
+  end
+
+  def init!
+    @brain.init!
+  end
+
+  def move field
+    moves_relative_to(orientation)
+      .zip(@brain.compute field.view)
+      .max_by { |(_, value)| value }
+      .first
+  end
+
+  def moves_relative_to orientation
+    MOVES.rotate(MOVES.index(orientation) - 1).first(3)
   end
 end
 
@@ -21,6 +36,7 @@ class Brain
         Link.new(input: input, output: output, weight: rand, innovation: 1)
       end
     end
+    self
   end
 
   def compute(inputs)
@@ -69,6 +85,46 @@ class Brain
   end
 end
 
-brain = Brain.new(inputs: 3, outputs: 3)
-brain.init!
-puts brain.compute([0, 1, 0])
+class Field
+  def initialize data
+    @data = data
+  end
+end
+
+seed = ARGV[0]&.to_i || Random.new_seed
+srand seed
+puts 'seed', seed
+
+inputs = [
+  [0, 0, 1],
+  [0, 1, 0],
+  [0, 1, 1],
+  [1, 0, 0],
+  [1, 0, 1],
+  [1, 1, 0],
+]
+outputs = [:straight, :left, :right]
+
+brains = 10.times.map { Brain.new(inputs: 3, outputs: 3).init! }
+brains_fitness = brains.map do |brain|
+  inputs.map do |input|
+    output = brain.compute input
+    direction = outputs.zip(output)
+      .max_by { |(_, value)| value }
+      .first
+
+    direction_input =
+      case direction
+      when :left then input[0]
+      when :straight then input[1]
+      when :right then input[2]
+      end
+
+    # puts '---'
+    # puts input.inspect
+    # puts [output, direction.zero? ? 'good' : 'bad'].inspect
+
+    direction_input.zero? ? input.count(1) : 0
+  end.sum
+end
+puts brains_fitness.inspect
