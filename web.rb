@@ -1,3 +1,5 @@
+#!/usr/bin/env bundle exec shotgun -Ilib
+
 require 'sinatra'
 
 get '/' do
