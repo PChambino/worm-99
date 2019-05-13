@@ -22,9 +22,3 @@ class Worm
     MOVES.rotate(MOVES.index(orientation) - 1).first 3
   end
 end
-
-class Field
-  def initialize data
-    @data = data
-  end
-end
