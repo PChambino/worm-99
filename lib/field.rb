@@ -37,7 +37,17 @@ class Field
   def square x, y
     return 1 if x < 0
     return 1 if y < 0
+    return 1 if x >= width
+    return 1 if y >= height
 
     0
+  end
+
+  def width
+    @data.dig(:board, :width)
+  end
+
+  def height
+    @data.dig(:board, :height)
   end
 end
