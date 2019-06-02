@@ -6,7 +6,7 @@ class Field
   end
 
   def orientation
-    head, neck = @data.dig(:you, :body)
+    head, neck = body
     return :up unless neck
 
     vertical = neck[:y] - head[:y]
@@ -21,7 +21,8 @@ class Field
   end
 
   def view
-    head = @data.dig(:you, :body).first
+    head = body.first
+
     view = [
       square(head[:x]-1, head[:y]),
       square(head[:x], head[:y]-1),
@@ -34,14 +35,19 @@ class Field
 
   private
 
+  def body
+    @data.dig(:you, :body)
+  end
+
   def square x, y
     return 1 if x < 0
     return 1 if y < 0
     return 1 if x >= width
     return 1 if y >= height
 
-    snakes = @data.dig(:board, :snakes).flat_map { |snake| snake[:body] }
-    return 1 if snakes.include?({ x: x, y: y })
+    snakes_coords = snakes.flat_map { |snake| snake[:body] }
+    return 1 if snakes_coords.include?({ x: x, y: y })
+    return -1 if food.include?({ x: x, y: y })
 
     0
   end
@@ -52,5 +58,13 @@ class Field
 
   def height
     @data.dig(:board, :height)
+  end
+
+  def snakes
+    @data.dig(:board, :snakes)
+  end
+
+  def food
+    @data.dig(:board, :food)
   end
 end

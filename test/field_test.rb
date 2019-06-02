@@ -32,16 +32,24 @@ class FieldTest < Minitest::Test
     assert_view [0, 0, 1], [[3, 3], [2, 3], [2, 4], [3, 4]]
   end
 
-  def assert_view view, you, *snakes, board: { height: 5, width: 5 }
+  def test_view_food
+    assert_view [0, -1, 0], [[3, 3]], food: [[3, 2]]
+  end
+
+  def assert_view view, you, *snakes, food: [], board: { height: 5, width: 5 }
     mapped_snakes = ([you] + snakes).map(&method(:map_snake))
 
     assert_equal view, Field.new(
-      board: board.merge(snakes: mapped_snakes),
+      board: board.merge(food: food.map(&method(:map_coord)), snakes: mapped_snakes),
       you: mapped_snakes.first,
     ).view
   end
 
   def map_snake snake
-    { body: snake.map { |(x, y)| { x: x, y: y } } }
+    { body: snake.map(&method(:map_coord)) }
+  end
+
+  def map_coord((x, y))
+    { x: x, y: y }
   end
 end
