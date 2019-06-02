@@ -4,6 +4,10 @@ require 'sinatra'
 require 'field'
 require 'worm'
 
+WORM = Worm.new brain: Brain.new(inputs: 3, outputs: 3).load! [
+  0.31671052931654775, 0.5307057940571163, 0.6222012759131952, 0.7531315216866732, 0.1986249920565537, 0.9927828675206156, 0.9737619138500143, 0.9950224210075828, 0.29391318040821657
+]
+
 get '/' do
   <<~TXT
   Home of Worm 99
@@ -23,9 +27,7 @@ end
 post '/move' do
   data = JSON.parse request.body.read, symbolize_names: true
   field = Field.new data
-  worm = Worm.new
-  moves = worm.moves_relative_to field.orientation
-  move = moves.sample
+  move = WORM.move field
   { move: move }.to_json
 end
 
