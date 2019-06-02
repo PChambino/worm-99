@@ -17,11 +17,7 @@ post '/ping' do
 end
 
 post '/start' do
-  {
-    color: '#736CCB',
-    headType: 'sand-worm',
-    tailType: 'freckled'
-  }.to_json
+  { color: random_colour, headType: HEADS.sample, tailType: TAILS.sample }.to_json
 end
 
 post '/move' do
@@ -36,3 +32,10 @@ end
 post '/end' do
   'done'
 end
+
+def random_colour
+  Random.new.bytes(3).unpack("H*").first
+end
+
+HEADS = %w[beluga bendr dead evil fang pixel regular safe sand-worm shades silly smile tongue]
+TAILS = %w[block-bum bolt curled fat-rattle freckled hook pixel regular round-bum sharp skinny small-rattle]
