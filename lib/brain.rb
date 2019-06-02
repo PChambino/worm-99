@@ -16,6 +16,21 @@ class Brain
     self
   end
 
+  def load!(data)
+    index = -1
+    @links = @inputs.flat_map do |input|
+      @outputs.map do |output|
+        index += 1
+        Link.new input: input, output: output, weight: data[index], innovation: 1
+      end
+    end
+    self
+  end
+
+  def dump
+    @links.map(&:dump)
+  end
+
   def compute(inputs)
     @inputs.zip(inputs).each { |node, value| node.value = value }
     @layers.each { |layer| layer.each { |node| node.compute } }
@@ -58,6 +73,10 @@ class Brain
 
     def disable
       @output.disable self
+    end
+
+    def dump
+      @weight
     end
   end
 end

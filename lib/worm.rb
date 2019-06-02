@@ -4,11 +4,7 @@ class Worm
   MOVES = %i[left up right down].freeze
 
   def initialize **options
-    @brain = options.fetch(:brain) { Brain.new inputs: 3, outputs: 3 }
-  end
-
-  def init!
-    @brain.init!
+    @brain = options.fetch(:brain) { Brain.new(inputs: 3, outputs: 3).init! }
   end
 
   def move field
