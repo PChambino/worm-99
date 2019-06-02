@@ -4,9 +4,11 @@ require 'sinatra'
 require 'field'
 require 'worm'
 
-WORM = Worm.new brain: Brain.new(inputs: 3, outputs: 3).load! [
-  0.31671052931654775, 0.5307057940571163, 0.6222012759131952, 0.7531315216866732, 0.1986249920565537, 0.9927828675206156, 0.9737619138500143, 0.9950224210075828, 0.29391318040821657
-]
+WORM = Worm.new brain: Brain.new(inputs: 3, outputs: 3).load!([
+  0.31671052931654775, 0.5307057940571163, 0.6222012759131952,
+  0.7531315216866732, 0.1986249920565537, 0.9927828675206156,
+  0.9737619138500143, 0.9950224210075828, 0.29391318040821657
+])
 
 get '/' do
   <<~TXT
@@ -36,7 +38,7 @@ post '/end' do
 end
 
 def random_colour
-  Random.new.bytes(3).unpack("H*").first
+  "##{Random.new.bytes(3).unpack("H*").first}"
 end
 
 HEADS = %w[beluga bendr dead evil fang pixel regular safe sand-worm shades silly smile tongue]
