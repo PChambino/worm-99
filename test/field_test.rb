@@ -14,4 +14,8 @@ class FieldTest < Minitest::Test
   def assert_orientation body, orientation
     assert_equal orientation, Field.new(you: { body: body }).orientation
   end
+
+  def test_view
+    assert_equal [1, 1, 0], Field.new(you: { body: [{ x: 0, y: 0 }] }).view
+  end
 end

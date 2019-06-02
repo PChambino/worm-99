@@ -1,4 +1,6 @@
 class Field
+  MOVES = %i[left up right down].freeze
+
   def initialize data
     @data = data
   end
@@ -16,5 +18,26 @@ class Field
     when vertical >= 0 then :up
     when vertical < 0 then :down
     end
+  end
+
+  def view
+    head = @data.dig(:you, :body).first
+    view = [
+      square(head[:x]-1, head[:y]),
+      square(head[:x], head[:y]-1),
+      square(head[:x]+1, head[:y]),
+      square(head[:x], head[:y]+1),
+    ]
+
+    view.rotate(MOVES.index(orientation) - 1).first 3
+  end
+
+  private
+
+  def square x, y
+    return 1 if x < 0
+    return 1 if y < 0
+
+    0
   end
 end
