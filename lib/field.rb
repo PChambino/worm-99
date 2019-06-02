@@ -11,10 +11,10 @@ class Field
     horizontal = neck[:x] - head[:x]
 
     case
-    when vertical > 0 then :up
-    when vertical < 0 then :down
     when horizontal > 0 then :left
     when horizontal < 0 then :right
+    when vertical >= 0 then :up
+    when vertical < 0 then :down
     end
   end
 end

@@ -3,6 +3,7 @@ require 'field'
 class FieldTest < Minitest::Test
   def test_orientation
     assert_orientation [{ x: 3, y: 3 }], :up
+    assert_orientation [{ x: 3, y: 3 }, { x: 3, y: 3 }], :up
     assert_orientation [{ x: 3, y: 3 }, { x: 3, y: 4 }], :up
     assert_orientation [{ x: 3, y: 3 }, { x: 3, y: 2 }], :down
     assert_orientation [{ x: 3, y: 3 }, { x: 4, y: 3 }], :left

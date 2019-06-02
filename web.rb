@@ -1,6 +1,8 @@
 #!/usr/bin/env bundle exec shotgun -Ilib
 
 require 'sinatra'
+require 'field'
+require 'worm'
 
 get '/' do
   <<~TXT
@@ -10,11 +12,11 @@ get '/' do
   TXT
 end
 
-post '/battle/ping' do
+post '/ping' do
   'pong'
 end
 
-post '/battle/start' do
+post '/start' do
   {
     color: '#736CCB',
     headType: 'sand-worm',
@@ -22,16 +24,15 @@ post '/battle/start' do
   }.to_json
 end
 
-post '/battle/move' do
-  { move: random_move }.to_json
+post '/move' do
+  data = JSON.parse request.body.read, symbolize_names: true
+  field = Field.new data
+  worm = Worm.new
+  moves = worm.moves_relative_to field.orientation
+  move = moves.sample
+  { move: move }.to_json
 end
 
-post '/battle/end' do
+post '/end' do
   'done'
-end
-
-MOVES = %w[up down left right].freeze
-
-def random_move
-  MOVES.sample
 end
