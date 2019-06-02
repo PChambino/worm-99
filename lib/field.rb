@@ -40,6 +40,9 @@ class Field
     return 1 if x >= width
     return 1 if y >= height
 
+    snakes = @data.dig(:board, :snakes).flat_map { |snake| snake[:body] }
+    return 1 if snakes.include?({ x: x, y: y })
+
     0
   end
 

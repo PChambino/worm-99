@@ -28,6 +28,8 @@ class FieldTest < Minitest::Test
 
   def test_view_snakes
     assert_view [0, 1, 0], [[3, 3]], [[3, 2]]
+    assert_view [0, 1, 0], [[3, 3], [3, 2]], [[3, 4]]
+    assert_view [0, 0, 1], [[3, 3], [2, 3], [2, 4], [3, 4]]
   end
 
   def assert_view view, you, *snakes, board: { height: 5, width: 5 }
