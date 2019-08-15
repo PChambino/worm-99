@@ -8,7 +8,7 @@ unless File.exist? 'engine/engine'
   abort
 end
 
-engine_args = '-b sql -a "user=worm-99 sslmode=disable"' if ARGV.first == 'db'
+engine_args = '-b sql -a "user=worm99 sslmode=disable"' if ARGV.first == 'db'
 
 spawn "engine/engine server #{engine_args}"
 spawn 'ruby -run -e httpd engine/board -p 3009'

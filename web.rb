@@ -1,14 +1,22 @@
 #!/usr/bin/env bundle exec shotgun -Ilib
 
 require 'sinatra'
+require 'sequel'
+
 require 'field'
 require 'worm'
 
-WORM = Worm.new brain: Brain.new(inputs: 3, outputs: 3).load!([
-  0.31671052931654775, 0.5307057940571163, 0.6222012759131952,
-  0.7531315216866732, 0.1986249920565537, 0.9927828675206156,
-  0.9737619138500143, 0.9950224210075828, 0.29391318040821657
-])
+DB = Sequel.connect("postgres://worm99:worm99@localhost:5432/worm99")
+WORMS = DB[:worms]
+
+WORM = Worm.new(
+  name: 'worm99',
+  brain: Brain.new(inputs: 3, outputs: 3).load!([
+    0.31671052931654775, 0.5307057940571163, 0.6222012759131952,
+    0.7531315216866732, 0.1986249920565537, 0.9927828675206156,
+    0.9737619138500143, 0.9950224210075828, 0.29391318040821657
+  ])
+)
 
 get '/' do
   <<~TXT
@@ -28,8 +36,17 @@ end
 
 post '/move' do
   data = JSON.parse request.body.read, symbolize_names: true
+
+  worm = WORMS[name: data.dig(:you, :name)]
+    .yield_self do |worm|
+      worm[:brain] = Brain.new(inputs: 3, outputs: 3)
+        .load! JSON.parse worm[:brain]
+
+      Worm.new worm
+    end
+
   field = Field.new data
-  move = WORM.move field
+  move = worm.move field
   { move: move }.to_json
 end
 

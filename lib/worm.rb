@@ -3,7 +3,10 @@ require 'brain'
 class Worm
   MOVES = %i[left up right down].freeze
 
-  def initialize **options
+  attr_reader :name, :brain
+
+  def initialize name:, **options
+    @name = name
     @brain = options.fetch(:brain) { Brain.new(inputs: 3, outputs: 3).init! }
   end
 
