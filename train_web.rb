@@ -22,7 +22,7 @@ WORMS = DB[:worms]
 
 worms =
   if WORMS.limit(1).count.zero?
-    10.times
+    1000.times
       .map { |index| Worm.new name: "worm-gen0-#{index}" }
       .each { |worm| WORMS.insert name: worm.name, brain: worm.brain.dump.to_json }
   else
@@ -36,23 +36,38 @@ worms =
 
 Engine = Faraday.new url: 'http://localhost:3005'
 
-10.times do
-worms.each do |worm|
-  res = Engine.post '/games' do |req|
-    req.headers['Content-Type'] = 'application/json'
-    req.body = {
-      width: 4,
-      height: 4,
-      food: 2,
-      snakes: [{ name: worm.name, url: 'http://localhost:9393' }]
-    }.to_json
+game_ids = worms.map do |worm|
+  sleep 0.5
+
+  5.times.map do
+    res = Engine.post '/games' do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.body = {
+        width: 8,
+        height: 8,
+        food: 2,
+        snakes: [{ name: worm.name, url: 'http://localhost:9393' }]
+      }.to_json
+    end
+
+    JSON.parse(res.body)
+      .yield_self { |res| res["ID"] }
+      .tap { |game_id| Engine.post "/games/#{game_id}/start" }
   end
-
-  game_id = JSON.parse(res.body)
-    .yield_self { |res| res["ID"] }
-
-  Engine.post "/games/#{game_id}/start"
-end
 end
 
-# select worm, SUM(turn::int), ARRAY_AGG(turn) FROM (select id, value#>>'{Snakes, 0, Name}' as worm, MAX(value->>'Turn')as turn from game_frames group by 1, 2 order by 2,3) x group by 1 order by 2;
+puts "waiting for games to finish..."
+gets
+
+fitnesses = DB[<<~SQL, game_ids]
+  SELECT worm, SUM(turn) FROM (
+    SELECT id, value#>>'{Snakes, 0, Name}' AS worm, MAX(turn) AS turn
+    FROM game_frames WHERE id IN ? GROUP BY 1, 2
+  ) x GROUP BY 1 ORDER BY 2
+SQL
+
+fitnesses.each do |fitness|
+  WORMS.where(name: fitness[:worm]).update(fitness: fitness[:sum])
+end
+
+# select worm, SUM(turn), ARRAY_AGG(turn) FROM (select id, value#>>'{Snakes, 0, Name}' as worm, MAX(turn) as turn from game_frames group by 1, 2) x group by 1 order by 2;

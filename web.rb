@@ -36,8 +36,10 @@ end
 
 post '/move' do
   data = JSON.parse request.body.read, symbolize_names: true
+  name = data.dig(:you, :name)
 
-  worm = WORMS[name: data.dig(:you, :name)]
+  worm = WORM if name == 'worm99'
+  worm ||= WORMS[name: name]
     .yield_self do |worm|
       worm[:brain] = Brain.new(inputs: 3, outputs: 3)
         .load! JSON.parse worm[:brain]
